@@ -1,397 +1,396 @@
 {
-    "appid": "78e515dc-da58-4028-9229-7bc625b71650",
-    "name": "ThreatCrowd",
-    "description": "This app provides free investigative actions such as <b>file reputation</b>, <b>lookup domain</b>, <b>lookup ip</b>, and <b>lookup email</b>.",
-    "publisher": "Phantom",
-    "type": "investigative",
-    "main_module": "threatcrowd_connector.pyc",
-    "app_version": "1.0.17",
-    "utctime_updated": "2017-12-21T03:25:25.000000Z",
-    "package_name": "phantom_threatcrowd",
-    "product_vendor": "ThreatCrowd",
-    "product_name": "ThreatCrowd",
-    "product_version_regex": ".*",
-    "min_phantom_version": "2.0.264",
-    "logo": "logo_threatcrowd.svg",
-    "logo_dark": "logo_threatcrowd_dark.svg",
-    "license": "Copyright (c) Phantom Cyber Corporation 2016",
-    "configuration": {},
-    "actions": [
-        {
-            "action": "lookup domain",
-            "description": "Queries ThreatCrowd for domain info",
-            "type": "investigate",
-            "identifier": "lookup_domain",
-            "read_only": true,
-            "parameters": {
-                "domain": {
-                    "description": "Domain to query",
-                    "data_type": "string",
-                    "contains": [
-                        "domain"
-                    ],
-                    "primary": true,
-                    "required": true
-                },
-                "response_limit": {
-                    "description": "Response length limit (0 = all, default 10)",
-                    "data_type": "numeric",
-                    "primary": true,
-                    "default": 10,
-                    "required": false
-                }
-            },
-            "render": {
-                "width": 12,
-                "title": "Lookup Domain",
-                "type": "table",
-                "height": 5
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.domain",
-                    "data_type": "string",
-                    "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.response_limit",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.emails",
-                    "data_type": "string",
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.permalink",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resolutions.*.ip_address",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ],
-                    "column_name": "IP Address",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data.*.resolutions.*.last_resolved",
-                    "data_type": "string",
-                    "column_name": "Last Resolved",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.response_code",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.subdomains",
-                    "data_type": "string",
-                    "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.votes",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "versions": "EQ(*)"
+  "appid": "78e515dc-da58-4028-9229-7bc625b71650",
+  "name": "ThreatCrowd",
+  "description": "This app provides free investigative actions such as <b>file reputation</b>, <b>lookup domain</b>, <b>lookup ip</b>, and <b>lookup email</b>.",
+  "publisher": "Phantom",
+  "type": "investigative",
+  "main_module": "threatcrowd_connector.pyc",
+    "app_version": "1.0.15",
+    "utctime_updated": "2017-04-29T02:30:42.000000Z",
+  "package_name": "phantom_threatcrowd",
+  "product_vendor": "ThreatCrowd",
+  "product_name": "ThreatCrowd",
+  "product_version_regex": ".*",
+  "min_phantom_version": "2.0.264",
+  "logo": "threatcrowd.png",
+  "license": "Copyright (c) Phantom Cyber Corporation 2016",
+  "configuration": {},
+  "actions": [
+    {
+      "action": "lookup domain",
+      "description": "Queries ThreatCrowd for domain info",
+      "type": "investigate",
+      "identifier": "lookup_domain",
+      "read_only": true,
+      "parameters": {
+        "domain": {
+          "description": "Domain to query",
+          "data_type": "string",
+          "contains": [
+            "domain"
+          ],
+          "primary": true,
+          "required": true
         },
-        {
-            "action": "lookup email",
-            "description": "Queries ThreatCrowd for email info",
-            "type": "investigate",
-            "identifier": "lookup_email",
-            "read_only": true,
-            "parameters": {
-                "email": {
-                    "description": "Email to query",
-                    "data_type": "string",
-                    "contains": [
-                        "email"
-                    ],
-                    "primary": true,
-                    "required": true
-                }
-            },
-            "render": {
-                "width": 12,
-                "title": "Lookup Email",
-                "type": "table",
-                "height": 5
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.email",
-                    "data_type": "string",
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.domains",
-                    "data_type": "string",
-                    "column_order": 0,
-                    "column_name": "Domains",
-                    "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.permalink",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.response_code",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "lookup ip",
-            "description": "Queries ThreatCrowd for IP info",
-            "type": "investigate",
-            "identifier": "lookup_ip",
-            "read_only": true,
-            "parameters": {
-                "ip": {
-                    "description": "IP to query",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ],
-                    "primary": true,
-                    "required": true
-                }
-            },
-            "render": {
-                "width": 12,
-                "title": "Lookup IP",
-                "type": "table",
-                "height": 5
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.hashes",
-                    "data_type": "string",
-                    "contains": [
-                        "hash"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.permalink",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resolutions.*.domain",
-                    "data_type": "string",
-                    "contains": [
-                        "domain"
-                    ],
-                    "column_order": 0,
-                    "column_name": "Domain Name"
-                },
-                {
-                    "data_path": "action_result.data.*.resolutions.*.last_resolved",
-                    "data_type": "string",
-                    "column_order": 1,
-                    "column_name": "Last Resolved"
-                },
-                {
-                    "data_path": "action_result.data.*.response_code",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.votes",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "file reputation",
-            "description": "Queries ThreatCrowd for file reputation",
-            "type": "investigate",
-            "identifier": "file_reputation",
-            "read_only": true,
-            "parameters": {
-                "hash": {
-                    "description": "Hash of the file in question",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "md5"
-                    ],
-                    "primary": true,
-                    "required": true
-                }
-            },
-            "render": {
-                "width": 12,
-                "title": "File Reputation",
-                "type": "json",
-                "height": 5
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.hash",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "md5",
-                        "sha1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.domains",
-                    "data_type": "string",
-                    "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ips",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.md5",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "md5"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.permalink",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.response_code",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.scans",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.sha1",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "sha1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "versions": "EQ(*)"
+        "response_limit": {
+          "description": "Response length limit (0 = all, default 10)",
+          "data_type": "numeric",
+          "primary": true,
+          "default": 10,
+          "required": false
         }
-    ]
+      },
+      "render": {
+        "width": 12,
+        "title": "Lookup Domain",
+        "type": "table",
+        "height": 5
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.votes",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.data.*.emails",
+          "data_type": "string",
+          "contains": [
+            "email"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.permalink",
+          "data_type": "string",
+          "contains": [
+            "url"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.subdomains",
+          "data_type": "string",
+          "contains": [
+            "domain"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.resolutions.*.ip_address",
+          "data_type": "string",
+          "contains": [
+            "ip"
+          ],
+          "column_name": "IP Address",
+          "column_order": 0
+        },
+        {
+          "data_path": "action_result.data.*.resolutions.*.last_resolved",
+          "data_type": "string",
+          "column_name": "Last Resolved",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.data.*.response_code",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary.total_objects",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.parameter.domain",
+          "data_type": "string",
+          "contains": [
+            "domain"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.response_limit",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric"
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "lookup email",
+      "description": "Queries ThreatCrowd for email info",
+      "type": "investigate",
+      "identifier": "lookup_email",
+      "read_only": true,
+      "parameters": {
+        "email": {
+          "description": "Email to query",
+          "data_type": "string",
+          "contains": [
+            "email"
+          ],
+          "primary": true,
+          "required": true
+        }
+      },
+      "render": {
+        "width": 12,
+        "title": "Lookup Email",
+        "type": "table",
+        "height": 5
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.domains",
+          "data_type": "string",
+          "column_order": 0,
+          "column_name": "Domains",
+          "contains": [
+            "domain"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.permalink",
+          "data_type": "string",
+          "contains": [
+            "url"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.response_code",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.parameter.email",
+          "data_type": "string",
+          "contains": [
+            "email"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric"
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "lookup ip",
+      "description": "Queries ThreatCrowd for IP info",
+      "type": "investigate",
+      "identifier": "lookup_ip",
+      "read_only": true,
+      "parameters": {
+        "ip": {
+          "description": "IP to query",
+          "data_type": "string",
+          "contains": [
+            "ip"
+          ],
+          "primary": true,
+          "required": true
+        }
+      },
+      "render": {
+        "width": 12,
+        "title": "Lookup IP",
+        "type": "table",
+        "height": 5
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.votes",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.data.*.hashes",
+          "data_type": "string",
+          "contains": [
+            "hash"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.permalink",
+          "data_type": "string",
+          "contains": [
+            "url"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.resolutions.*.domain",
+          "data_type": "string",
+          "contains": [
+            "domain"
+          ],
+          "column_order": 0,
+          "column_name": "Domain Name"
+        },
+        {
+          "data_path": "action_result.data.*.resolutions.*.last_resolved",
+          "data_type": "string",
+          "column_order": 1,
+          "column_name": "Last Resolved"
+        },
+        {
+          "data_path": "action_result.data.*.response_code",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.parameter.ip",
+          "data_type": "string",
+          "contains": [
+            "ip"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric"
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "file reputation",
+      "description": "Queries ThreatCrowd for file reputation",
+      "type": "investigate",
+      "identifier": "file_reputation",
+      "read_only": true,
+      "parameters": {
+        "hash": {
+          "description": "Hash of the file in question",
+          "data_type": "string",
+          "contains": [
+            "hash",
+            "md5"
+          ],
+          "primary": true,
+          "required": true
+        }
+      },
+      "render": {
+        "width": 12,
+        "title": "File Reputation",
+        "type": "json",
+        "height": 5
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.ips",
+          "data_type": "string",
+          "contains": [
+            "ip"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.md5",
+          "data_type": "string",
+          "contains": [
+            "hash",
+            "md5"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.sha1",
+          "data_type": "string",
+          "contains": [
+            "hash",
+            "sha1"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.scans",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.domains",
+          "data_type": "string",
+          "contains": [
+            "domain"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.permalink",
+          "data_type": "string",
+          "contains": [
+            "url"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.response_code",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary.total_objects",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.parameter.hash",
+          "data_type": "string",
+          "contains": [
+            "hash",
+            "md5",
+            "sha1"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric"
+        }
+      ],
+      "versions": "EQ(*)"
+    }
+  ]
 }
