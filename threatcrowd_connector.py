@@ -1,27 +1,26 @@
-# --
 # File: threatcrowd_connector.py
+# Copyright (c) 2016-2021 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2016
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
-# --
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 # Phantom Imports below
 import phantom.app as phantom
 from phantom.app import BaseConnector
 from phantom.app import ActionResult
 
-# THIS Connector imports
+from bs4 import BeautifulSoup
 from threatcrowd_consts import *
-
-# Regular imports below
 import requests
-import simplejson as json
+import json
+import os
+import sys
+import ipaddress
+
+try:
+    from urllib.parse import unquote
+except:
+    from urllib import unquote
 
 
 class ThreatCrowdConnector(BaseConnector):
@@ -35,54 +34,219 @@ class ThreatCrowdConnector(BaseConnector):
     def __init__(self):
 
         super(ThreatCrowdConnector, self).__init__()
+        self._proxy = None
+
+    def _is_ipv6(self, input_ip_address):
+        """ Function that checks given address and returns True if the address is a valid IPV6 address.
+        :param input_ip_address: IP address
+        :return: status (success/failure)
+        """
+
+        ip_address_input = input_ip_address
+
+        # If interface is present in the IP, it will be separated by the %
+        if '%' in input_ip_address:
+            ip_address_input = input_ip_address.split('%')[0]
+
+        try:
+            ipaddress.ip_address(ip_address_input)
+        except:
+            return False
+
+        return True
 
     def initialize(self):
-        ''' Called once for every action.  All member initializations occur here'''
+        ''' Called once for every action. All member initializations occur here'''
 
+        config = self.get_config()
         # Get the base URL from the consts file
         self._base_url = THREATCROWD_BASE_URL
 
         # Initialize the headers here for use elsewhere
         self._headers = {'Accept': 'application/json'}
 
+        self.set_validator('ipv6', self._is_ipv6)
+
         # The URI is initialized and is used in every rest endpoint call
         self._api_uri = THREATCROWD_API_URI
+        self._proxy = {}
+        env_vars = config.get('_reserved_environment_variables', {})
+        if 'HTTP_PROXY' in env_vars:
+            self._proxy['http'] = env_vars['HTTP_PROXY']['value']
+        elif 'HTTP_PROXY' in os.environ:
+            self._proxy['http'] = os.environ.get('HTTP_PROXY')
+
+        if 'HTTPS_PROXY' in env_vars:
+            self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
+        elif 'HTTPS_PROXY' in os.environ:
+            self._proxy['https'] = os.environ.get('HTTPS_PROXY')
 
         return phantom.APP_SUCCESS
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = THREATCROWD_ERR_CODE_UNAVAILABLE
+        error_msg = THREATCROWD_ERR_MESSAGE_UNAVAILABLE
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = THREATCROWD_ERR_CODE_UNAVAILABLE
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, THREATCROWD_VALIDATE_INTEGER.format(param=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, THREATCROWD_VALIDATE_INTEGER.format(param=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATCROWD_NON_NEG_PARAM.format(param=key)), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATCROWD_NON_ZERO_NON_NEG_INVALID_PARAM.format(param=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _process_empty_response(self, action_result):
+
+        return (action_result.set_status(phantom.APP_ERROR, "Received empty response from the server"), None)
+
+    def _process_json_response(self, r, action_result):
+
+        # Try a json parse
+        try:
+            resp_json = r.json()
+        except Exception as e:
+            error_msg = unquote(self._get_error_message_from_exception(e))
+            return (action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(error_msg)), None)
+
+        # Check the status code if anything useful was returned
+        if (200 <= r.status_code <= 399) and resp_json.get("response_code") == "1":
+            return (phantom.APP_SUCCESS, resp_json)
+
+        elif resp_json.get("response_code") == "0":
+            return (phantom.APP_ERROR, resp_json)
+
+        else:
+            return (action_result.set_status(phantom.APP_ERROR, THREATCROWD_ERR_SERVER_CONNECTION), resp_json)
+
+    def _process_html_response(self, response, action_result):
+
+        status_code = response.status_code
+
+        if 200 <= status_code <= 399 and self.get_action_identifier() == self.ACTION_ID_LOOKUP_IP:
+            # The https://www.threatcrowd.org/searchApi/v2/ip/report/?ip=<<ip_address>>
+            # this endpoint returns JSON response for a valid IP addresses but
+            # in the content-type it shows HTML so due this we call _process_json_response.
+            return self._process_json_response(response, action_result)
+
+        try:
+            soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer, navigation and span part from the HTML message
+            for element in soup(["script", "style", "footer", "nav", "span"]):
+                element.extract()
+            error_text = soup.text
+            split_lines = error_text.split('\n')
+            split_lines = [x.strip() for x in split_lines if x.strip()]
+            error_text = '\n'.join(split_lines)
+        except:
+            error_text = "Cannot parse error details"
+
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
+                error_text)
+
+        message = message.replace('{', '{{').replace('}', '}}')
+
+        return (action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _process_response(self, r, action_result):
+
+        # store the r_text in debug data, it will get dumped in the logs if the action fails
+        if hasattr(action_result, 'add_debug_data'):
+            action_result.add_debug_data({'r_status_code': r.status_code})
+            action_result.add_debug_data({'r_text': r.text})
+            action_result.add_debug_data({'r_headers': r.headers})
+
+        # Process each 'Content-Type' of response separately
+
+        # it's not content-type that is to be parsed, handle an empty response
+        if not r.text:
+            return self._process_empty_response(action_result)
+
+        # Process a json response
+        if 'json' in r.headers.get('Content-Type', ''):
+            return self._process_json_response(r, action_result)
+
+        # Process an HTML response, Do this no matter what the api talks.
+        # There is a high chance of a PROXY in between phantom and the rest of
+        # world, in case of errors, PROXY's return HTML, this function parses
+        # the error and adds it to the action_result.
+        if 'html' in r.headers.get('Content-Type', ''):
+            return self._process_html_response(r, action_result)
+
+        # everything else is actually an error at this point
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
+                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+
+        return (action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, params):
 
         # Build the URL
-        call_url = self._base_url + self._api_uri + endpoint
+        call_url = "{0}{1}{2}".format(self._base_url, self._api_uri, endpoint)
 
         resp_json = {}
 
         # Make the rest call
         try:
-            r = requests.get(call_url, params=params)
+            r = requests.get(call_url, params=params, headers=self._headers, proxies=self._proxy)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, THREATCROWD_ERR_SERVER_CONNECTION, e), resp_json)
+            error_msg = unquote(self._get_error_message_from_exception(e))
+            return (action_result.set_status(phantom.APP_ERROR, '{0} {1}'.format(THREATCROWD_ERR_SERVER_CONNECTION, error_msg)), resp_json)
 
-        # Try to parse the rest call's response
-        try:
-            resp_json = r.json()
-        except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, THREATCROWD_ERR_JSON_PARSE, e), resp_json)
+        return self._process_response(r, action_result)
 
-        # Check the status code if anything useful was returned
-        if (200 <= r.status_code <= 399) and resp_json["response_code"] == "1":
+    def _limit_response(self, response, keys_to_limit, limit):
+        """
+        This method updates the response based on the provided limit.
+        :param response: API response
+        :param keys_to_limit: Keys to limit
+        :param limit: Limit provided by the user
+        :return: Updated response
+        """
+        for resp, value in list(response.items()):
+            # Sometimes the result will have an empty entry. This gets rid of it
+            if isinstance(value, list):
+                response[resp] = list(filter(None, value))
+            if resp in keys_to_limit:
+                temp_list = []
+                resp_len = len(response[resp])
+                for x in range(0, limit):
+                    if resp_len > 0 and resp_len > x:
+                        temp_list.append(response[resp][x])
+                    elif resp_len <= x:
+                        break
+                response[resp] = temp_list
 
-            return (phantom.APP_SUCCESS, resp_json)
-
-        elif resp_json["response_code"] == "0":
-
-            return (phantom.APP_ERROR, resp_json)
-
-        else:
-            return (action_result.set_status(phantom.APP_ERROR, THREATCROWD_ERR_SERVER_CONNECTION, resp_json))
+        return response
 
     def _lookup_domain(self, param):
 
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
         # Create an action result to add data to
 
         action_result = self.add_action_result(ActionResult(param))
@@ -91,37 +255,38 @@ class ThreatCrowdConnector(BaseConnector):
 
         params['domain'] = param[THREATCROWD_JSON_DOMAIN]
 
+        limit = param.get(THREATCROWD_JSON_LIMIT, THREATCROWD_DEFAULT_LIMIT)
+        ret_val, limit = self._validate_integer(action_result, limit, THREATCROWD_JSON_LIMIT, True)
+        if phantom.is_fail(ret_val):
+            self.debug_print('Error occurred while validating the integer')
+            return action_result.get_status()
+
         endpoint = THREATCROWD_DOMAIN_URI
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params)
 
-        if (phantom.is_fail(ret_val)):
-            if response["response_code"] == "0":
-                action_result.set_summary({'Error': 'Did not receive any information.'})
+        if phantom.is_fail(ret_val):
+            if response and "response_code" in response and response["response_code"] == "0":
+                self.debug_print('Response code is 0')
+                action_result.set_summary({'Message': 'Did not receive any information'})
                 return action_result.set_status(phantom.APP_SUCCESS)
-            action_result.set_status(phantom.APP_ERROR, "Failure during rest call.", response)
-            return phantom.APP_ERROR
-
-        limit = param.get(param[THREATCROWD_JSON_LIMIT], THREATCROWD_DEFAULT_LIMIT)
+            self.debug_print('Error response returned from the API')
+            return action_result.get_status()
 
         keys_to_limit = ["hashes", "subdomains", "resolutions"]
-        total_res = len(response["resolutions"])
-        if (0 < limit < total_res):
-            for resp, val in response.iteritems():
-                if resp in keys_to_limit:
-                    temp_list = []
-                    for x in range(0, limit):
-                        if len(response[resp]) > 0:
-                            temp_list.append(response[resp][x])
-                    response[resp].update(temp_list)
+        total_res = len(response.get("resolutions", []))
+
+        if (limit > 0):
+            response = self._limit_response(response, keys_to_limit, limit)
 
         action_result.add_data(response)
-        action_result.update_summary({"total_objects": limit if limit < total_res else total_res})
+        action_result.update_summary({"total_objects": limit if limit < total_res and limit != 0 else total_res})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_email(self, param):
 
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
         # Create an action result to add data to
 
         action_result = self.add_action_result(ActionResult(param))
@@ -130,25 +295,47 @@ class ThreatCrowdConnector(BaseConnector):
 
         params['email'] = param[THREATCROWD_JSON_EMAIL]
 
+        limit = param.get(THREATCROWD_JSON_LIMIT, THREATCROWD_DEFAULT_LIMIT)
+        ret_val, limit = self._validate_integer(action_result, limit, THREATCROWD_JSON_LIMIT, True)
+        if phantom.is_fail(ret_val):
+            self.debug_print('Error occurred while validating the integer')
+            return action_result.get_status()
+
         endpoint = THREATCROWD_EMAIL_URI
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params)
 
-        if (phantom.is_fail(ret_val)):
-            if response["response_code"] == "0":
-                action_result.set_summary({'Error': 'Did not receive any information.'})
+        if phantom.is_fail(ret_val):
+            if response and "response_code" in response and response["response_code"] == "0":
+                self.debug_print('Response code is 0')
+                action_result.set_summary({'Message': 'Did not receive any information'})
                 return action_result.set_status(phantom.APP_SUCCESS)
-            action_result.set_status(phantom.APP_ERROR, "Failure during rest call.", response)
-            return
+            self.debug_print('Error response returned from the API')
+            return action_result.get_status()
+
+        keys_to_limit = ["domains"]
+        total_res = len(response.get("domains", []))
+
+        if (limit > 0):
+            response = self._limit_response(response, keys_to_limit, limit)
+
+        for resp, _ in list(response.items()):
+            temp_list = []
+            if resp == "domains":
+                for value in list(response[resp]):
+                    temp_dict = {"domain": value}
+                    temp_list.append(temp_dict)
+                response[resp] = temp_list
 
         action_result.add_data(response)
 
-        action_result.update_summary({"total_objects": len(response["domains"])})
+        action_result.update_summary({"total_objects": limit if limit < total_res and limit != 0 else total_res})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_ip(self, param):
 
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
         # Create an action result to add data to
 
         action_result = self.add_action_result(ActionResult(param))
@@ -157,25 +344,39 @@ class ThreatCrowdConnector(BaseConnector):
 
         params['ip'] = param[THREATCROWD_JSON_IP]
 
+        limit = param.get(THREATCROWD_JSON_LIMIT, THREATCROWD_DEFAULT_LIMIT)
+        ret_val, limit = self._validate_integer(action_result, limit, THREATCROWD_JSON_LIMIT, True)
+        if phantom.is_fail(ret_val):
+            self.debug_print('Error occurred while validating the integer')
+            return action_result.get_status()
+
         endpoint = THREATCROWD_IP_URI
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params)
 
-        if (phantom.is_fail(ret_val)):
-            if response["response_code"] == "0":
-                action_result.set_summary({'Error': 'Did not receive any information.'})
+        if phantom.is_fail(ret_val):
+            if response and "response_code" in response and response["response_code"] == "0":
+                self.debug_print('Response code is 0')
+                action_result.set_summary({'Message': 'Did not receive any information'})
                 return action_result.set_status(phantom.APP_SUCCESS)
-            action_result.set_status(phantom.APP_ERROR, "Failure during rest call.", response)
-            return phantom.APP_ERROR
+            self.debug_print('Error response returned from the API')
+            return action_result.get_status()
+
+        keys_to_limit = ["resolutions", "hashes"]
+        total_res = len(response.get("resolutions", []))
+
+        if (limit > 0):
+            response = self._limit_response(response, keys_to_limit, limit)
 
         action_result.add_data(response)
 
-        action_result.update_summary({"total_objects": len(response["resolutions"])})
+        action_result.update_summary({"total_objects": limit if limit < total_res and limit != 0 else total_res})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _file_reputation(self, param):
 
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
         # Create an action result
         action_result = self.add_action_result(ActionResult(param))
 
@@ -189,22 +390,22 @@ class ThreatCrowdConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params)
 
-        if (phantom.is_fail(ret_val)):
-            if response["response_code"] == "0":
-                action_result.set_summary({'Error': 'Did not receive any information.'})
+        if phantom.is_fail(ret_val):
+            if response and "response_code" in response and response["response_code"] == "0":
+                self.debug_print('Response code is 0')
+                action_result.set_summary({'Message': 'Did not receive any information'})
                 return action_result.set_status(phantom.APP_SUCCESS)
-            action_result.set_status(phantom.APP_ERROR, "Failure during rest call.", response)
-            return phantom.APP_ERROR
+            self.debug_print('Error response returned from the API')
+            return action_result.get_status()
 
-        # Sometimes the scans result will have an empty entry.  This gets rid of it
-        count = 0
-        for resp in response["scans"]:
-            if len(resp) != 0:
-                count += 1
+        # Sometimes the scans result will have an empty entry. This gets rid of it
+        for resp, value in list(response.items()):
+            if isinstance(value, list):
+                response[resp] = list(filter(None, value))
 
         action_result.add_data(response)
 
-        action_result.update_summary({"total_objects": count})
+        action_result.update_summary({"total_objects": len(response.get("scans", []))})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -229,10 +430,10 @@ class ThreatCrowdConnector(BaseConnector):
 
         return ret_val
 
+
 if __name__ == '__main__':
     """ This section is executed when run in standalone debug mode """
 
-    import sys
     import pudb
 
     pudb.set_trace()
@@ -248,6 +449,6 @@ if __name__ == '__main__':
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
 
-        print ret_val
+        print(ret_val)
 
     exit(0)
