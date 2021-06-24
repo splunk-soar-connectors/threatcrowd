@@ -19,6 +19,8 @@ THREATCROWD_FILE_URI = "file/report/"
 THREATCROWD_DEFAULT_LIMIT = 10
 
 # This value is set by trial and error by quering ThreatCrowd
+THREATCROWD_ERR_CONNECTIVITY_TEST = "Test connectivity failed"
+THREATCROWD_SUCC_CONNECTIVITY_TEST = "Test connectivity passed"
 THREATCROWD_ERR_CODE_UNAVAILABLE = "Error code unavailable"
 THREATCROWD_ERR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 THREATCROWD_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the ThreatCrowd server. Please check the asset configuration and|or the action parameters"

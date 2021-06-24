@@ -30,6 +30,7 @@ class ThreatCrowdConnector(BaseConnector):
     ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
     ACTION_ID_LOOKUP_IP = "lookup_ip"
     ACTION_ID_FILE_REPUTATION = "file_reputation"
+    ACTION_ID_TEST_CONNECTIVITY = "test_asset_connectivity"
 
     def __init__(self):
 
@@ -154,6 +155,9 @@ class ThreatCrowdConnector(BaseConnector):
             # in the content-type it shows HTML so due this we call _process_json_response.
             return self._process_json_response(response, action_result)
 
+        if 200 <= status_code <= 399 and self.get_action_identifier() == self.ACTION_ID_TEST_CONNECTIVITY:
+            return (action_result.set_status(phantom.APP_SUCCESS, THREATCROWD_SUCC_CONNECTIVITY_TEST), None)
+
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             # Remove the script, style, footer, navigation and span part from the HTML message
@@ -207,7 +211,10 @@ class ThreatCrowdConnector(BaseConnector):
     def _make_rest_call(self, endpoint, action_result, params):
 
         # Build the URL
-        call_url = "{0}{1}{2}".format(self._base_url, self._api_uri, endpoint)
+        if self.get_action_identifier() == self.ACTION_ID_TEST_CONNECTIVITY:
+            call_url = "{0}".format(self._base_url)
+        else:
+            call_url = "{0}{1}{2}".format(self._base_url, self._api_uri, endpoint)
 
         resp_json = {}
 
@@ -409,6 +416,25 @@ class ThreatCrowdConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def test_asset_connectivity(self, param):
+        # Create an action result to add data to
+
+        action_result = self.add_action_result(ActionResult(param))
+
+        params = {}
+
+        endpoint = ''
+
+        self.save_progress('Querying base URL for checking connectivity')
+
+        ret_val, response = self._make_rest_call(endpoint, action_result, params)
+        if phantom.is_fail(ret_val):
+            self.save_progress(THREATCROWD_ERR_CONNECTIVITY_TEST)
+            return action_result.get_status()
+
+        self.save_progress(THREATCROWD_SUCC_CONNECTIVITY_TEST)
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def handle_action(self, param):
         ''' This is the function that handles all of the actions'''
 
@@ -427,6 +453,8 @@ class ThreatCrowdConnector(BaseConnector):
             ret_val = self._lookup_ip(param)
         elif action == self.ACTION_ID_FILE_REPUTATION:
             ret_val = self._file_reputation(param)
+        elif action == self.ACTION_ID_TEST_CONNECTIVITY:
+            ret_val = self.test_asset_connectivity(param)
 
         return ret_val
 

@@ -22,6 +22,16 @@
     "configuration": {},
     "actions": [
         {
+            "action": "test connectivity",
+            "description": "This action will run the test domain to check the connectivity with the threat crowd server and this action will not affect any other actions irrespective of the connectivity result",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "lookup domain",
             "description": "Queries ThreatCrowd for domain info",
             "verbose": "Here the limit parameter will limit the response for the following keys: 'hashes', 'subdomains', 'resolutions'",
