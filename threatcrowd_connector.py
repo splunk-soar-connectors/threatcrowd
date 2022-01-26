@@ -230,7 +230,7 @@ class ThreatCrowdConnector(BaseConnector):
 
         # Make the rest call
         try:
-            r = requests.get(call_url, params=params, headers=self._headers, proxies=self._proxy)
+            r = requests.get(call_url, params=params, headers=self._headers, proxies=self._proxy, timeout=30)
         except Exception as e:
             error_msg = unquote(self._get_error_message_from_exception(e))
             return (action_result.set_status(phantom.APP_ERROR, '{0} {1}'.format(THREATCROWD_ERR_SERVER_CONNECTION, error_msg)), resp_json)
@@ -489,4 +489,4 @@ if __name__ == '__main__':
 
         print(ret_val)
 
-    exit(0)
+    sys.exit(0)
