@@ -15,17 +15,17 @@
 #
 #
 # Phantom Imports below
-import phantom.app as phantom
-from phantom.app import BaseConnector
-from phantom.app import ActionResult
-
-from bs4 import BeautifulSoup
-from threatcrowd_consts import *
-import requests
+import ipaddress
 import json
 import os
 import sys
-import ipaddress
+
+import phantom.app as phantom
+import requests
+from bs4 import BeautifulSoup
+from phantom.app import ActionResult, BaseConnector
+
+from threatcrowd_consts import *
 
 try:
     from urllib.parse import unquote
