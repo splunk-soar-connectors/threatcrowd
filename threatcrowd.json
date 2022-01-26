@@ -13,9 +13,10 @@
     "product_version_regex": ".*",
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
+    "fips_compliant": true,
     "logo": "logo_threatcrowd.svg",
     "logo_dark": "logo_threatcrowd_dark.svg",
-    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "license": "Copyright (c) 2016-2022 Splunk Inc.",
     "latest_tested_versions": [
         "Cloud, Jun 11 2021"
     ],
@@ -34,7 +35,7 @@
         {
             "action": "lookup domain",
             "description": "Queries ThreatCrowd for domain info",
-            "verbose": "Here the limit parameter will limit the response for the following keys: 'hashes', 'subdomains', 'resolutions'",
+            "verbose": "Here the limit parameter will limit the response for the following keys: 'hashes', 'subdomains', 'resolutions'.",
             "type": "investigate",
             "identifier": "lookup_domain",
             "read_only": true,
@@ -182,7 +183,7 @@
         {
             "action": "lookup email",
             "description": "Queries ThreatCrowd for email info",
-            "verbose": "Here the limit parameter will limit the response for the following key: 'domains'",
+            "verbose": "Here the limit parameter will limit the response for the following key: 'domains'.",
             "type": "investigate",
             "identifier": "lookup_email",
             "read_only": true,
@@ -301,7 +302,7 @@
         {
             "action": "lookup ip",
             "description": "Queries ThreatCrowd for IP info",
-            "verbose": "Here the limit parameter will limit the response for the following keys: 'hashes', 'resolutions'",
+            "verbose": "Here the limit parameter will limit the response for the following keys: 'hashes', 'resolutions'.",
             "type": "investigate",
             "identifier": "lookup_ip",
             "read_only": true,
