@@ -15,17 +15,17 @@
 #
 #
 # Phantom Imports below
-import phantom.app as phantom
-from phantom.app import BaseConnector
-from phantom.app import ActionResult
-
-from bs4 import BeautifulSoup
-from threatcrowd_consts import *
-import requests
+import ipaddress
 import json
 import os
 import sys
-import ipaddress
+
+import phantom.app as phantom
+import requests
+from bs4 import BeautifulSoup
+from phantom.app import ActionResult, BaseConnector
+
+from threatcrowd_consts import *
 
 try:
     from urllib.parse import unquote
@@ -230,7 +230,7 @@ class ThreatCrowdConnector(BaseConnector):
 
         # Make the rest call
         try:
-            r = requests.get(call_url, params=params, headers=self._headers, proxies=self._proxy)
+            r = requests.get(call_url, params=params, headers=self._headers, proxies=self._proxy, timeout=30)
         except Exception as e:
             error_msg = unquote(self._get_error_message_from_exception(e))
             return (action_result.set_status(phantom.APP_ERROR, '{0} {1}'.format(THREATCROWD_ERR_SERVER_CONNECTION, error_msg)), resp_json)
@@ -489,4 +489,4 @@ if __name__ == '__main__':
 
         print(ret_val)
 
-    exit(0)
+    sys.exit(0)
