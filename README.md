@@ -2,11 +2,11 @@
 # ThreatCrowd
 
 Publisher: Splunk  
-Connector Version: 2\.0\.3  
+Connector Version: 2\.0\.5  
 Product Vendor: ThreatCrowd  
 Product Name: ThreatCrowd  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.9\.39220  
+Minimum Product Version: 5\.1\.0  
 
 This app provides free investigative actions
 
@@ -35,7 +35,7 @@ Queries ThreatCrowd for domain info
 Type: **investigate**  
 Read only: **True**
 
-Here the limit parameter will limit the response for the following keys\: 'hashes', 'subdomains', 'resolutions'
+Here the limit parameter will limit the response for the following keys\: 'hashes', 'subdomains', 'resolutions'\.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -69,7 +69,7 @@ Queries ThreatCrowd for email info
 Type: **investigate**  
 Read only: **True**
 
-Here the limit parameter will limit the response for the following key\: 'domains'
+Here the limit parameter will limit the response for the following key\: 'domains'\.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -99,7 +99,7 @@ Queries ThreatCrowd for IP info
 Type: **investigate**  
 Read only: **True**
 
-Here the limit parameter will limit the response for the following keys\: 'hashes', 'resolutions'
+Here the limit parameter will limit the response for the following keys\: 'hashes', 'resolutions'\.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
