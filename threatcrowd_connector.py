@@ -1,21 +1,31 @@
 # File: threatcrowd_connector.py
-# Copyright (c) 2016-2021 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
-
+# Copyright (c) 2016-2022 Splunk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
+#
+#
 # Phantom Imports below
-import phantom.app as phantom
-from phantom.app import BaseConnector
-from phantom.app import ActionResult
-
-from bs4 import BeautifulSoup
-from threatcrowd_consts import *
-import requests
+import ipaddress
 import json
 import os
 import sys
-import ipaddress
+
+import phantom.app as phantom
+import requests
+from bs4 import BeautifulSoup
+from phantom.app import ActionResult, BaseConnector
+
+from threatcrowd_consts import *
 
 try:
     from urllib.parse import unquote
@@ -220,7 +230,7 @@ class ThreatCrowdConnector(BaseConnector):
 
         # Make the rest call
         try:
-            r = requests.get(call_url, params=params, headers=self._headers, proxies=self._proxy)
+            r = requests.get(call_url, params=params, headers=self._headers, proxies=self._proxy, timeout=30)
         except Exception as e:
             error_msg = unquote(self._get_error_message_from_exception(e))
             return (action_result.set_status(phantom.APP_ERROR, '{0} {1}'.format(THREATCROWD_ERR_SERVER_CONNECTION, error_msg)), resp_json)
@@ -479,4 +489,4 @@ if __name__ == '__main__':
 
         print(ret_val)
 
-    exit(0)
+    sys.exit(0)
