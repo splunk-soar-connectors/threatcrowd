@@ -1,6 +1,6 @@
 # File: threatcrowd_connector.py
 #
-# Copyright (c) 2016-2022 Splunk Inc.
+# Copyright (c) 2016-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,21 +99,21 @@ class ThreatCrowdConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-        error_code = THREATCROWD_ERR_CODE_UNAVAILABLE
-        error_msg = THREATCROWD_ERR_MESSAGE_UNAVAILABLE
+        error_code = THREATCROWD_ERROR_CODE_UNAVAILABLE
+        error_message = THREATCROWD_ERROR_MESSAGE_UNAVAILABLE
 
         try:
             if e.args:
                 if len(e.args) > 1:
                     error_code = e.args[0]
-                    error_msg = e.args[1]
+                    error_message = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = THREATCROWD_ERR_CODE_UNAVAILABLE
-                    error_msg = e.args[0]
+                    error_code = THREATCROWD_ERROR_CODE_UNAVAILABLE
+                    error_message = e.args[0]
         except:
             pass
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_message)
 
     def _validate_integer(self, action_result, parameter, key, allow_zero=False):
         if parameter is not None:
@@ -142,8 +142,8 @@ class ThreatCrowdConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            error_msg = unquote(self._get_error_message_from_exception(e))
-            return (action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(error_msg)), None)
+            error_message = unquote(self._get_error_message_from_exception(e))
+            return (action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(error_message)), None)
 
         # Check the status code if anything useful was returned
         if (200 <= r.status_code <= 399) and resp_json.get("response_code") == "1":
@@ -153,7 +153,7 @@ class ThreatCrowdConnector(BaseConnector):
             return (phantom.APP_ERROR, resp_json)
 
         else:
-            return (action_result.set_status(phantom.APP_ERROR, THREATCROWD_ERR_SERVER_CONNECTION), resp_json)
+            return (action_result.set_status(phantom.APP_ERROR, THREATCROWD_ERROR_SERVER_CONNECTION), resp_json)
 
     def _process_html_response(self, response, action_result):
 
@@ -232,8 +232,8 @@ class ThreatCrowdConnector(BaseConnector):
         try:
             r = requests.get(call_url, params=params, headers=self._headers, proxies=self._proxy, timeout=30)
         except Exception as e:
-            error_msg = unquote(self._get_error_message_from_exception(e))
-            return (action_result.set_status(phantom.APP_ERROR, '{0} {1}'.format(THREATCROWD_ERR_SERVER_CONNECTION, error_msg)), resp_json)
+            error_message = unquote(self._get_error_message_from_exception(e))
+            return (action_result.set_status(phantom.APP_ERROR, '{0} {1}'.format(THREATCROWD_ERROR_SERVER_CONNECTION, error_message)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -439,7 +439,7 @@ class ThreatCrowdConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params)
         if phantom.is_fail(ret_val):
-            self.save_progress(THREATCROWD_ERR_CONNECTIVITY_TEST)
+            self.save_progress(THREATCROWD_ERROR_CONNECTIVITY_TEST)
             return action_result.get_status()
 
         self.save_progress(THREATCROWD_SUCC_CONNECTIVITY_TEST)
