@@ -6,7 +6,7 @@ Connector Version: 2.0.6
 Product Vendor: ThreatCrowd  
 Product Name: ThreatCrowd  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.1.0  
+Minimum Product Version: 6.3.0  
 
 This app provides free investigative actions
 
