@@ -31,8 +31,9 @@ THREATCROWD_ERROR_CONNECTIVITY_TEST = "Test connectivity failed"
 THREATCROWD_SUCC_CONNECTIVITY_TEST = "Test connectivity passed"
 THREATCROWD_ERROR_CODE_UNAVAILABLE = "Error code unavailable"
 THREATCROWD_ERROR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
-THREATCROWD_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = ("Error occurred while connecting to the ThreatCrowd server. "
-"Please check the asset configuration and|or the action parameters")
+THREATCROWD_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = (
+    "Error occurred while connecting to the ThreatCrowd server. " "Please check the asset configuration and|or the action parameters"
+)
 
 # Integer Validation Keys
 THREATCROWD_VALIDATE_INTEGER = "Please provide a valid integer value in the '{param}' parameter"
