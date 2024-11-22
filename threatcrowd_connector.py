@@ -470,23 +470,74 @@ class ThreatCrowdConnector(BaseConnector):
 
 
 if __name__ == "__main__":
-    """This section is executed when run in standalone debug mode"""
+
+    import argparse
 
     import pudb
 
     pudb.set_trace()
 
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
+    argparser.add_argument("-v", "--verify", action="store_true", help="verify", required=False, default=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+    verify = args.verify
+
+    if username is not None and password is None:
+
+        # User specified a username but not a password, so ask
+        import getpass
+
+        password = getpass.getpass("Password: ")
+
+    if username and password:
+        try:
+            print("Accessing the Login page")
+            r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=verify, timeout=MSTEAMS_DEFAULT_TIMEOUT)
+            csrftoken = r.cookies["csrftoken"]
+
+            data = dict()
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
+
+            headers = dict()
+            headers["Cookie"] = "csrftoken={}".format(csrftoken)
+            headers["Referer"] = BaseConnector._get_phantom_base_url() + "login"
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(
+                BaseConnector._get_phantom_base_url() + "login", verify=verify, data=data, headers=headers, timeout=MSTEAMS_DEFAULT_TIMEOUT
+            )
+            session_id = r2.cookies["sessionid"]
+        except Exception as e:
+            print("Unable to get session id from the platfrom. Error: {}".format(str(e)))
+            sys.exit(1)
+
+    if len(sys.argv) < 2:
+        print("No test json specified as input")
+        sys.exit(0)
+
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print(json.dumps(in_json, indent=" " * 4))
+        print(json.dumps(in_json, indent=4))
 
-        connector = ThreatCrowdConnector()
-
+        connector = MicrosoftTeamConnector()
         connector.print_progress_message = True
 
-        ret_val = connector._handle_action(json.dumps(in_json), None)
+        if session_id is not None:
+            in_json["user_session_token"] = session_id
 
-        print(ret_val)
+        ret_val = connector._handle_action(json.dumps(in_json), None)
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     sys.exit(0)

@@ -1,2 +1,2 @@
 **Unreleased**
-* changed base url for threatcrowd app.
+* Changed the base url of the Threatcrowd API.
