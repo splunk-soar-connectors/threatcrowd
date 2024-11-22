@@ -531,7 +531,7 @@ if __name__ == "__main__":
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
-        connector = MicrosoftTeamConnector()
+        connector = ThreatCrowdConnector()
         connector.print_progress_message = True
 
         if session_id is not None:
