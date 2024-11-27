@@ -17,7 +17,7 @@ THREATCROWD_JSON_EMAIL = "email"
 THREATCROWD_JSON_IP = "ip"
 THREATCROWD_JSON_FILE = "hash"
 THREATCROWD_JSON_LIMIT = "response_limit"
-THREATCROWD_BASE_URL = "https://www.threatcrowd.org/"
+THREATCROWD_BASE_URL = "http://ci-www.threatcrowd.org/"
 THREATCROWD_API_URI = "searchApi/v2/"
 THREATCROWD_ERROR_SERVER_CONNECTION = "Could not successfully connect to the Threatcrowd API"
 THREATCROWD_DOMAIN_URI = "domain/report/"
@@ -31,8 +31,9 @@ THREATCROWD_ERROR_CONNECTIVITY_TEST = "Test connectivity failed"
 THREATCROWD_SUCC_CONNECTIVITY_TEST = "Test connectivity passed"
 THREATCROWD_ERROR_CODE_UNAVAILABLE = "Error code unavailable"
 THREATCROWD_ERROR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
-THREATCROWD_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = ("Error occurred while connecting to the ThreatCrowd server. "
-"Please check the asset configuration and|or the action parameters")
+THREATCROWD_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = (
+    "Error occurred while connecting to the ThreatCrowd server. " "Please check the asset configuration and|or the action parameters"
+)
 
 # Integer Validation Keys
 THREATCROWD_VALIDATE_INTEGER = "Please provide a valid integer value in the '{param}' parameter"
