@@ -5,20 +5,20 @@
     "publisher": "Splunk",
     "type": "investigative",
     "main_module": "threatcrowd_connector.py",
-    "app_version": "2.0.6",
+    "app_version": "2.1.0",
     "utctime_updated": "2022-01-29T00:20:42.000000Z",
     "package_name": "phantom_threatcrowd",
     "product_vendor": "ThreatCrowd",
     "product_name": "ThreatCrowd",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.1.0",
+    "min_phantom_version": "6.3.0",
     "python_version": "3",
     "fips_compliant": true,
     "logo": "logo_threatcrowd.svg",
     "logo_dark": "logo_threatcrowd_dark.svg",
     "license": "Copyright (c) 2016-2024 Splunk Inc.",
     "latest_tested_versions": [
-        "Cloud, Jun 11 2021"
+        "Cloud, Nov 22 2024"
     ],
     "configuration": {},
     "actions": [
@@ -569,27 +569,9 @@
         }
     ],
     "pip_dependencies": {
-        "wheel": [
-            {
-                "module": "beautifulsoup4",
-                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
-            },
-            {
-                "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
-            }
-        ]
+        "wheel": []
     },
     "pip39_dependencies": {
-        "wheel": [
-            {
-                "module": "beautifulsoup4",
-                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
-            },
-            {
-                "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.5-py3-none-any.whl"
-            }
-        ]
+        "wheel": []
     }
 }
