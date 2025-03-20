@@ -1,6 +1,6 @@
 # File: threatcrowd_consts.py
 #
-# Copyright (c) 2016-2024 Splunk Inc.
+# Copyright (c) 2016-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ THREATCROWD_SUCC_CONNECTIVITY_TEST = "Test connectivity passed"
 THREATCROWD_ERROR_CODE_UNAVAILABLE = "Error code unavailable"
 THREATCROWD_ERROR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 THREATCROWD_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = (
-    "Error occurred while connecting to the ThreatCrowd server. " "Please check the asset configuration and|or the action parameters"
+    "Error occurred while connecting to the ThreatCrowd server. Please check the asset configuration and|or the action parameters"
 )
 
 # Integer Validation Keys

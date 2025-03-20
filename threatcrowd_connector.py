@@ -1,6 +1,6 @@
 # File: threatcrowd_connector.py
 #
-# Copyright (c) 2016-2024 Splunk Inc.
+# Copyright (c) 2016-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ from phantom.app import ActionResult, BaseConnector
 
 from threatcrowd_consts import *
 
+
 try:
     from urllib.parse import unquote
 except:
@@ -34,7 +35,6 @@ except:
 
 
 class ThreatCrowdConnector(BaseConnector):
-
     # Supported actions
     ACTION_ID_LOOKUP_EMAIL = "lookup_email"
     ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
@@ -43,8 +43,7 @@ class ThreatCrowdConnector(BaseConnector):
     ACTION_ID_TEST_CONNECTIVITY = "test_asset_connectivity"
 
     def __init__(self):
-
-        super(ThreatCrowdConnector, self).__init__()
+        super().__init__()
         self._proxy = None
 
     def _is_ipv6(self, input_ip_address):
@@ -113,7 +112,7 @@ class ThreatCrowdConnector(BaseConnector):
         except:
             pass
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_message)
+        return f"Error Code: {error_code}. Error Message: {error_message}"
 
     def _validate_integer(self, action_result, parameter, key, allow_zero=False):
         if parameter is not None:
@@ -133,17 +132,15 @@ class ThreatCrowdConnector(BaseConnector):
         return phantom.APP_SUCCESS, parameter
 
     def _process_empty_response(self, action_result):
-
         return (action_result.set_status(phantom.APP_ERROR, "Received empty response from the server"), None)
 
     def _process_json_response(self, r, action_result):
-
         # Try a json parse
         try:
             resp_json = r.json()
         except Exception as e:
             error_message = unquote(self._get_error_message_from_exception(e))
-            return (action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(error_message)), None)
+            return (action_result.set_status(phantom.APP_ERROR, f"Unable to parse JSON response. {error_message}"), None)
 
         # Check the status code if anything useful was returned
         if (200 <= r.status_code <= 399) and resp_json.get("response_code") == "1":
@@ -156,7 +153,6 @@ class ThreatCrowdConnector(BaseConnector):
             return (action_result.set_status(phantom.APP_ERROR, THREATCROWD_ERROR_SERVER_CONNECTION), resp_json)
 
     def _process_html_response(self, response, action_result):
-
         status_code = response.status_code
 
         if 200 <= status_code <= 399 and self.get_action_identifier() == self.ACTION_ID_LOOKUP_IP:
@@ -180,14 +176,13 @@ class ThreatCrowdConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = f"Status Code: {status_code}. Data from server:\n{error_text}\n"
 
         message = message.replace("{", "{{").replace("}", "}}")
 
         return (action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
-
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, "add_debug_data"):
             action_result.add_debug_data({"r_status_code": r.status_code})
@@ -212,19 +207,18 @@ class ThreatCrowdConnector(BaseConnector):
             return self._process_html_response(r, action_result)
 
         # everything else is actually an error at this point
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
+        message = "Can't process response from server. Status Code: {} Data from server: {}".format(
             r.status_code, r.text.replace("{", "{{").replace("}", "}}")
         )
 
         return (action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, params):
-
         # Build the URL
         if self.get_action_identifier() == self.ACTION_ID_TEST_CONNECTIVITY:
-            call_url = "{0}".format(self._base_url)
+            call_url = f"{self._base_url}"
         else:
-            call_url = "{0}{1}{2}".format(self._base_url, self._api_uri, endpoint)
+            call_url = f"{self._base_url}{self._api_uri}{endpoint}"
 
         resp_json = {}
 
@@ -233,7 +227,7 @@ class ThreatCrowdConnector(BaseConnector):
             r = requests.get(call_url, params=params, headers=self._headers, proxies=self._proxy, timeout=30)
         except Exception as e:
             error_message = unquote(self._get_error_message_from_exception(e))
-            return (action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(THREATCROWD_ERROR_SERVER_CONNECTION, error_message)), resp_json)
+            return (action_result.set_status(phantom.APP_ERROR, f"{THREATCROWD_ERROR_SERVER_CONNECTION} {error_message}"), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -262,8 +256,7 @@ class ThreatCrowdConnector(BaseConnector):
         return response
 
     def _lookup_domain(self, param):
-
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Create an action result to add data to
 
         action_result = self.add_action_result(ActionResult(param))
@@ -302,8 +295,7 @@ class ThreatCrowdConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_email(self, param):
-
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Create an action result to add data to
 
         action_result = self.add_action_result(ActionResult(param))
@@ -351,8 +343,7 @@ class ThreatCrowdConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_ip(self, param):
-
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Create an action result to add data to
 
         action_result = self.add_action_result(ActionResult(param))
@@ -392,8 +383,7 @@ class ThreatCrowdConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _file_reputation(self, param):
-
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Create an action result
         action_result = self.add_action_result(ActionResult(param))
 
