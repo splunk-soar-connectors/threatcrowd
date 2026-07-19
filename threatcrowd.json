@@ -16,7 +16,7 @@
     "fips_compliant": true,
     "logo": "logo_threatcrowd.svg",
     "logo_dark": "logo_threatcrowd_dark.svg",
-    "license": "Copyright (c) 2016-2025 Splunk Inc.",
+    "license": "Copyright (c) 2016-2026 Splunk Inc.",
     "latest_tested_versions": [
         "Cloud, Nov 22 2024"
     ],
@@ -567,5 +567,11 @@
             },
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip39_dependencies": {
+        "wheel": []
+    },
+    "pip313_dependencies": {
+        "wheel": []
+    }
 }
