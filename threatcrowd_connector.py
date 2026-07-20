@@ -1,6 +1,6 @@
 # File: threatcrowd_connector.py
 #
-# Copyright (c) 2016-2025 Splunk Inc.
+# Copyright (c) 2016-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -427,7 +427,7 @@ class ThreatCrowdConnector(BaseConnector):
 
         self.save_progress("Querying base URL for checking connectivity")
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, params)
+        ret_val, _response = self._make_rest_call(endpoint, action_result, params)
         if phantom.is_fail(ret_val):
             self.save_progress(THREATCROWD_ERROR_CONNECTIVITY_TEST)
             return action_result.get_status()

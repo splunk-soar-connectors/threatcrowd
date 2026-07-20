@@ -1,6 +1,6 @@
 # File: threatcrowd_consts.py
 #
-# Copyright (c) 2016-2025 Splunk Inc.
+# Copyright (c) 2016-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ THREATCROWD_JSON_EMAIL = "email"
 THREATCROWD_JSON_IP = "ip"
 THREATCROWD_JSON_FILE = "hash"
 THREATCROWD_JSON_LIMIT = "response_limit"
-THREATCROWD_BASE_URL = "http://ci-www.threatcrowd.org/"
+THREATCROWD_BASE_URL = "https://ci-www.threatcrowd.org/"
 THREATCROWD_API_URI = "searchApi/v2/"
 THREATCROWD_ERROR_SERVER_CONNECTION = "Could not successfully connect to the Threatcrowd API"
 THREATCROWD_DOMAIN_URI = "domain/report/"

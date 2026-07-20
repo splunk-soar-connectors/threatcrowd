@@ -1,26 +1,26 @@
 # ThreatCrowd
 
-Publisher: Splunk \
-Connector Version: 2.1.3 \
-Product Vendor: ThreatCrowd \
-Product Name: ThreatCrowd \
+Publisher: Splunk <br>
+Connector Version: 2.1.3 <br>
+Product Vendor: ThreatCrowd <br>
+Product Name: ThreatCrowd <br>
 Minimum Product Version: 6.3.0
 
 This app provides free investigative actions
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - This action will run the test domain to check the connectivity with the threat crowd server and this action will not affect any other actions irrespective of the connectivity result \
-[lookup domain](#action-lookup-domain) - Queries ThreatCrowd for domain info \
-[lookup email](#action-lookup-email) - Queries ThreatCrowd for email info \
-[lookup ip](#action-lookup-ip) - Queries ThreatCrowd for IP info \
+[test connectivity](#action-test-connectivity) - This action will run the test domain to check the connectivity with the threat crowd server and this action will not affect any other actions irrespective of the connectivity result <br>
+[lookup domain](#action-lookup-domain) - Queries ThreatCrowd for domain info <br>
+[lookup email](#action-lookup-email) - Queries ThreatCrowd for email info <br>
+[lookup ip](#action-lookup-ip) - Queries ThreatCrowd for IP info <br>
 [file reputation](#action-file-reputation) - Queries ThreatCrowd for file reputation
 
 ## action: 'test connectivity'
 
 This action will run the test domain to check the connectivity with the threat crowd server and this action will not affect any other actions irrespective of the connectivity result
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -35,7 +35,7 @@ No Output
 
 Queries ThreatCrowd for domain info
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Here the limit parameter will limit the response for the following keys: 'hashes', 'subdomains', 'resolutions'.
@@ -72,7 +72,7 @@ summary.total_objects_successful | numeric | | 3 |
 
 Queries ThreatCrowd for email info
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Here the limit parameter will limit the response for the following key: 'domains'.
@@ -105,7 +105,7 @@ summary.total_objects_successful | numeric | | 3 |
 
 Queries ThreatCrowd for IP info
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Here the limit parameter will limit the response for the following keys: 'hashes', 'resolutions'.
@@ -141,7 +141,7 @@ summary.total_objects_successful | numeric | | 3 |
 
 Queries ThreatCrowd for file reputation
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -173,7 +173,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
