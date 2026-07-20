@@ -1,7 +1,7 @@
 # ThreatCrowd
 
 Publisher: Splunk <br>
-Connector Version: 2.1.3 <br>
+Connector Version: 2.1.4 <br>
 Product Vendor: ThreatCrowd <br>
 Product Name: ThreatCrowd <br>
 Minimum Product Version: 6.3.0
