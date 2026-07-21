@@ -1,3 +1,1 @@
 **Unreleased**
-
-* Lookup actions now fail when ThreatCrowd has no information for the requested indicator.
