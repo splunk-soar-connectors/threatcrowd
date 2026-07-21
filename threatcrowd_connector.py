@@ -147,7 +147,7 @@ class ThreatCrowdConnector(BaseConnector):
             return (phantom.APP_SUCCESS, resp_json)
 
         elif resp_json.get("response_code") == "0":
-            return (phantom.APP_ERROR, resp_json)
+            return (action_result.set_status(phantom.APP_ERROR, THREATCROWD_ERROR_NOT_FOUND), resp_json)
 
         else:
             return (action_result.set_status(phantom.APP_ERROR, THREATCROWD_ERROR_SERVER_CONNECTION), resp_json)
@@ -276,10 +276,6 @@ class ThreatCrowdConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, params)
 
         if phantom.is_fail(ret_val):
-            if response and "response_code" in response and response["response_code"] == "0":
-                self.debug_print("Response code is 0")
-                action_result.set_summary({"Message": "Did not receive any information"})
-                return action_result.set_status(phantom.APP_SUCCESS)
             self.debug_print("Error response returned from the API")
             return action_result.get_status()
 
@@ -315,10 +311,6 @@ class ThreatCrowdConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, params)
 
         if phantom.is_fail(ret_val):
-            if response and "response_code" in response and response["response_code"] == "0":
-                self.debug_print("Response code is 0")
-                action_result.set_summary({"Message": "Did not receive any information"})
-                return action_result.set_status(phantom.APP_SUCCESS)
             self.debug_print("Error response returned from the API")
             return action_result.get_status()
 
@@ -363,10 +355,6 @@ class ThreatCrowdConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, params)
 
         if phantom.is_fail(ret_val):
-            if response and "response_code" in response and response["response_code"] == "0":
-                self.debug_print("Response code is 0")
-                action_result.set_summary({"Message": "Did not receive any information"})
-                return action_result.set_status(phantom.APP_SUCCESS)
             self.debug_print("Error response returned from the API")
             return action_result.get_status()
 
@@ -398,10 +386,6 @@ class ThreatCrowdConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, params)
 
         if phantom.is_fail(ret_val):
-            if response and "response_code" in response and response["response_code"] == "0":
-                self.debug_print("Response code is 0")
-                action_result.set_summary({"Message": "Did not receive any information"})
-                return action_result.set_status(phantom.APP_SUCCESS)
             self.debug_print("Error response returned from the API")
             return action_result.get_status()
 
