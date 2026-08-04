@@ -142,6 +142,15 @@ class ThreatCrowdConnector(BaseConnector):
             error_message = unquote(self._get_error_message_from_exception(e))
             return (action_result.set_status(phantom.APP_ERROR, f"Unable to parse JSON response. {error_message}"), None)
 
+        if not isinstance(resp_json, dict):
+            return (
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Unexpected JSON response type from server: {type(resp_json).__name__}",
+                ),
+                None,
+            )
+
         # Check the status code if anything useful was returned
         if (200 <= r.status_code <= 399) and resp_json.get("response_code") == "1":
             return (phantom.APP_SUCCESS, resp_json)
